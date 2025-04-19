@@ -4,4 +4,4 @@ using Microsoft.EntityFrameworkCore;
 namespace ForumNG.Infrastructure.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options) { }
+    : IdentityDbContext<User>(options) { }
