@@ -18,4 +18,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ForumNG.Application\ForumNG.Application.csproj" />
+    <ProjectReference Include="..\ForumNG.Api\ForumNG.Api.csproj" />
+  </ItemGroup>
+
 </Project>

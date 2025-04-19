@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>ForumNG.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ForumNG.ServiceDefaults\ForumNG.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\ForumNG.Application\ForumNG.Application.csproj" />
+    <ProjectReference Include="..\ForumNG.Domain\ForumNG.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

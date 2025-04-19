@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ForumNG.ApiService\ForumNG.ApiService.csproj" />
+    <ProjectReference Include="..\ForumNG.Api\ForumNG.Api.csproj" />
     <ProjectReference Include="..\ForumNG.Web\ForumNG.Web.csproj" />
   </ItemGroup>
 

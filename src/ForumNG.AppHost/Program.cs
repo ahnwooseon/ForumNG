@@ -1,9 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var apiService = builder.AddProject<Projects.ForumNG_ApiService>("apiservice");
+var api = builder.AddProject<Projects.ForumNG_Api>("api");
 
 builder.AddProject<Projects.ForumNG_Web>("webfrontend")
     .WithExternalHttpEndpoints()
-    .WithReference(apiService);
+    .WithReference(api);
 
 builder.Build().Run();
