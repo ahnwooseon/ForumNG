@@ -1,136 +1,103 @@
 # 🚀 Forum NextGen
 
-**La plateforme sociale, réinventée — Open, gamifiée, respectueuse de l’anonymat, scalable, en temps réel.**
-
-Inspirée des meilleures idées de Reddit, 4chan et des architectures modernes : vitesse, modularité, sécurité… et entièrement pensée pour la communauté et les développeurs.
+> Le forum du futur : **anonyme, rapide, ouvert, gamifié**.  
+> 100 % communautaire. Respect total de la vie privée.
 
 ---
 
-## 📋 Table des Matières
+**👀 En un coup d’œil**
+- 🔐 Anonymat natif & privacy-first
+- ⚡ Temps réel (votes, threads, notif, chat)
+- 🎮 Gamification évoluée (karma, badges, progression)
+- 🛡️ AI & outils modernes pour la sécurité et la modération
+- 📱 Mobile ready & PWA
+- 🤝 Gouvernance par les utilisateurs
 
-- [Présentation Générale](#présentation-générale)
-- [Stack & Architecture](#stack--architecture)
-- [Fonctionnalités Clés](#fonctionnalités-clés)
-- [Modération & Sécurité](#modération--sécurité)
-- [Abonnements & Tiers](#abonnements--tiers)
-- [Points Critiques](#points-critiques)
-- [Vue d’Architecture](#vue-darchitecture)
+---
+
+## 📋 Sommaire
+
+- [Pourquoi NextGen ?](#pourquoi-nextgen-)
+- [Fonctionnalités clés](#fonctionnalités-clés)
+- [Architecture](#architecture)
+- [Sécurité & Modération](#sécurité--modération)
+- [Tiers & Abonnements](#tiers--abonnements)
 - [Roadmap](#roadmap)
 - [Contribuer](#contribuer)
 - [Licence](#licence)
 
 ---
 
-## 🌍 Présentation Générale
+## 🌟 Pourquoi NextGen ?
 
-|            |                                                                                                 |
-|:-----------|:------------------------------------------------------------------------------------------------|
-| **Mission**    | Créer le hub communautaire de nouvelle génération : performances, options d’anonymat, gamification et interactions en temps réel |
-| **Tech Stack** | .NET 9, Blazor, Syncfusion, SignalR, Docker, PostgreSQL, Azure-ready                          |
-| **Hébergement**| De local (NAS/Docker) à scalable dans le cloud (Azure/Kubernetes)                            |
-| **Principes**  | Modularité, sécurité, confidentialité, gouvernance décentralisée, extensibilité              |
+> Plus qu’un forum : **un réseau vivant, modulable, où la voix de chaque membre compte.**
 
----
-
-## 🛠️ Stack & Architecture
-
-| Couche / Zone      | Technologies, Responsabilités                              |
-|--------------------|-----------------------------------------------------------|
-| **Frontend**       | Blazor, Syncfusion                                        |
-| **API Gateway**    | REST, gRPC, GraphQL, SignalR                              |
-| **Authentification**| ASP.NET Identity, JWT, Anonyme                           |
-| **Business Logic** | Clean Architecture, CQRS/ES, DDD, MediatR                 |
-| **Données**        | PostgreSQL, EventStoreDB, RabbitMQ                        |
-| **Modération ML**  | Perspective API, modèles ML personnalisés                 |
-| **Temps Réel**     | SignalR (threads, chat, notifications)                    |
-| **Observabilité**  | Serilog, OpenTelemetry, Grafana/Prometheus                |
-| **Gamification**   | Karma, badges, progression                                |
-| **Infra/CI-CD**    | Docker, Azure-ready, déploiement local ou cloud           |
+- **Respect & liberté** : profils anonymes ou non, tu choisis
+- **Performances** : .NET 9, Blazor, SignalR, Docker
+- **Scalable, prêt pour le cloud ou DIY** (Azure/Kube, ou local/NAS)
+- **Communauté active** : votes, modération DAO, évolutions en co-création
 
 ---
 
-## 🧩 Fonctionnalités Clés
+## 🧩 Fonctionnalités clés
 
-- **Authentification Hybride** : Email/anonyme, upgrade rapide de compte
-- **APIs riches** : REST, gRPC, GraphQL publics/privés
-- **Gamification** : Karma, levels, badges, profils dynamiques
-- **Notifications temps réel** : SignalR pour événements, alertes, discussions
-- **Contenus riches** : Threads, markdown, médias embarqués
-- **Sécurité et confidentialité** : JWT, rôles, anti-bruteforce, conformité RGPD
-- **Communauté** : Vote, élections de modérateurs, gouvernance DAO
-- **Mobile Ready** : PWA, responsive, native-ready
-
----
-
-## 🛡️ Modération & Sécurité
-
-- **AI & ML** : Détection/filtrage en temps réel (Perspective API & modèles personnalisés)
-- **Outils modérateurs** : Dashboard, audit log, workflows avancés
-- **Sanctions** : Ban/mute/shadowban temporaires ou permanents, actions par thread
-- **Signalement utilisateur** : Un clic, tracking transparent
-- **Filtres personnalisés** : Mots-clés, triggers, score de toxicité
-- **Vie privée/légalité** : Logs RGPD-friendly, gestion d’appels/recours utilisateurs
-- **Boucles de feedback** : Réputation modérateur, ajustement des standards
+- **Switch anonyme ↔️ compte en 2 clics**
+- **API moderne : REST, gRPC, GraphQL, OAuth**
+- **Markdown partout + médias intégrés**
+- **Authentification hybride**
+- **Temps réel total avec SignalR**
+- **Gamification : karma, niveaux, badges, profils évolutifs**
+- **Gouvernance ouverte & outils collectifs**
 
 ---
 
-## 💎 Abonnements & Tiers
+## 🏗️ Architecture
 
-| Tier           | Fonctionnalités principales                                                |
-|----------------|---------------------------------------------------------------------------|
-| 🏅 **Basic**   | Discussion, quotas standards                                               |
-| ⭐ **Premium** | Customisation, anti-pub, notifications avancées, filtres personnalisés     |
-| 👑 **VIP**     | Modération prioritaire, topics exclusifs, early features, support haut niveau |
-
-- Upgrade/downgrade fluide, facturation privacy-first (Stripe/PayPal-ready)
-
----
-
-## 🧭 Points Critiques
-
-- **Accessibilité** : Conforme WCAG, navigation clavier, ARIA
-- **International** : Système i18n/l10n modulaire
-- **Backup & export** : Export utilisateurs, backups sécures, disaster recovery
-- **Sécurité** : Protection DoS, quotas IP/user, rate limiting API
-- **API extensible** : OAuth, API publique ouverte, plugins
-- **Outils communautaires** : Modération collective, votes, propositions
-- **Conformité** : Analytics opt-out, respect de la législation
+| Couche         | Techs / Rôle                                    |
+|----------------|-------------------------------------------------|
+| Frontend       | Blazor, Syncfusion (Web, Mobile-ready)          |
+| Gateway        | REST, gRPC, GraphQL, SignalR                    |
+| Application    | CQRS, Event Sourcing, DDD, gamification, MediatR|
+| Données        | PostgreSQL, EventStoreDB, RabbitMQ              |
+| ML/AI          | Perspective API, modèles custom                 |
+| Infra/Obs      | Docker, Azure, Kube, Serilog, OpenTelemetry     |
 
 ---
 
-## 🗺️ Vue d’Architecture
+## 🛡️ Sécurité & Modération
 
-| Couche               | Stack / Responsabilité                        |
-|----------------------|-----------------------------------------------|
-| **Clients**          | Blazor Web, apps mobiles                      |
-| **API Gateway**      | REST, gRPC, GraphQL, SignalR                  |
-| **Web/UI**           | Blazor, Syncfusion                            |
-| **Application**      | CQRS, Event Sourcing, MediatR, gamification   |
-| **Domaine**          | DDD, agrégats, entités                        |
-| **Temps Réel**       | SignalR (threads live, présence, chat)        |
-| **Persistance**      | PostgreSQL, EventStoreDB                      |
-| **Moderation AI**    | Intégration ML/Perspective API                |
-| **Observabilité**    | Serilog, OpenTelemetry, Grafana               |
-| **Déploiement**      | Docker, NAS, Azure, Kubernetes                |
+- **Filtrage AI/ML temps réel**
+- **Ban, shadowban, signalement en 1 clic**
+- **Dashboards & logs RGPD-friendly**
+- **Protections avancées : quotas, rate limit, anti-DoS**
+- **Feedback sur la modération** (réputation, ajustement collectif)
+
+---
+
+## 💎 Tiers & Abonnements
+
+| Tier        | Avantages principaux                                   |
+|-------------|-------------------------------------------------------|
+| 🏅 Basic    | Tout le nécessaire, quotas standards                   |
+| ⭐ Premium  | Sans pub, customisation, filtres, alertes avancées     |
+| 👑 VIP      | Modération prioritaire, accès exclusifs, support dédié |
+
+> **Facturation privacy-first.**  
+> Upgrade/downgrade instantané. Jamais de revente de données !
 
 ---
 
 ## 📅 Roadmap
 
-1. **Fondation/Infra** : Scaffold architecture, UI & authentification
-2. **Business Logic** : Domaines clés (forums, users, threads, modération) avec CQRS/ES
-3. **Temps réel & APIs** : SignalR, APIs, notifications
-4. **Modération avancée** : AI/ML, outils admin live
-5. **Abonnements/Premium** : Paiement, gating, tiers
-6. **Déploiement/Observabilité** : Docker, CI/CD, monitoring, backup/export
-7. **Tests & Lancement** : Perf, accessibilité, PWA/mobile, rollout public
+1. Fondation technique & base forum
+2. Utilisateurs, threads, modération scalable
+3. Temps réel (SignalR), notifications, chat
+4. Modération AI/ML, outils admin avancés
+5. Paiement et gestion des abonnements
+6. Déploiement, monitoring, export, backup
+7. Accessibilité, i18n, tests massifs, lancement public
 
 ---
 
-## 🤝 Contribuer
-
-Toute aide est la bienvenue ! Suggestions, issues, PR : ouvrez la discussion.  
-Pour contribuer :
-1. Créez un fork, une branche,
-2. Proposez des PR bien décrites,
-3. Respectez la netiquette, proposez des issues si besoin.
+⚡ **Forum NextGen : le forum dont VOUS êtes le moteur.  
+Rejoignez l’aventure dès aujourd’hui !**
