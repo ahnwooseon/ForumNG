@@ -1,4 +1,4 @@
-using ForumNG.Web.Data;
+using ForumNG.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace ForumNG.Web.Components.Account;
