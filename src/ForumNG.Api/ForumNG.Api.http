@@ -1,0 +1,6 @@
+@ForumNG.Api= http://localhost:5070
+
+GET {{ForumNG.Api}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/ForumNG.ApiService/ForumNG.ApiService.csproj" />
+    <Project Path="src/ForumNG.Api/ForumNG.Api.csproj" />
     <Project Path="src/ForumNG.AppHost/ForumNG.AppHost.csproj" />
     <Project Path="src/ForumNG.ServiceDefaults/ForumNG.ServiceDefaults.csproj" />
     <Project Path="src/ForumNG.Web/ForumNG.Web.csproj" />
