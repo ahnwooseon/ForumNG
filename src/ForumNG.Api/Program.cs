@@ -1,3 +1,20 @@
+using FluentResults;
+using ForumNG.Api.Endpoints;
+using ForumNG.Application.Commands.Posts.CreatePost;
+using ForumNG.Application.Commands.Topics.CreateTopic;
+using ForumNG.Application.Mappings;
+using ForumNG.Application.Queries.Posts.GetPostById;
+using ForumNG.Application.Queries.Posts.GetPostsByTopicId;
+using ForumNG.Application.Queries.Topics.GetAllTopics;
+using ForumNG.Application.Queries.Topics.GetTopicById;
+using ForumNG.Application.Queries.Users.GetUserById;
+using ForumNG.Domain.DTOs;
+using ForumNG.Domain.Interfaces;
+using ForumNG.Infrastructure.Data;
+using ForumNG.Infrastructure.Repositories;
+using Mediator;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -9,6 +26,27 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddProblemDetails();
 
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ITopicRepository, TopicRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddMediator(options =>
+{
+    options.ServiceLifetime = ServiceLifetime.Scoped;
+});
+
+MapsterRegister.RegisterMappings();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:Configuration"];
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,40 +57,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing",
-    "Bracing",
-    "Chilly",
-    "Cool",
-    "Mild",
-    "Warm",
-    "Balmy",
-    "Hot",
-    "Sweltering",
-    "Scorching",
-};
-
-app.MapGet(
-        "/weatherforecast",
-        () =>
-        {
-            var forecast = Enumerable
-                .Range(1, 5)
-                .Select(index => new WeatherForecast(
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-                .ToArray();
-            return forecast;
-        }
-    )
-    .WithName("GetWeatherForecast");
+PostsEndpoints.MapPostsEndpoints(app);
+TopicsEndpoints.MapTopicsEndpoints(app);
+UsersEndpoints.MapUsersEndpoints(app);
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

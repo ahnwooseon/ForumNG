@@ -8,11 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ForumNG.Domain\ForumNG.Domain.csproj" />
+    <ProjectReference Include="..\ForumNG.Infrastructure\ForumNG.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="FluentResults" Version="3.16.0" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
   </ItemGroup>
 
 </Project>

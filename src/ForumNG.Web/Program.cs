@@ -47,6 +47,9 @@ builder
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddHttpClient("MyApiClient", client =>
+    client.BaseAddress = new Uri("https://localhost:7370/"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -68,6 +71,7 @@ app.UseAntiforgery();
 app.UseOutputCache();
 
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 // Add additional endpoints required by the Identity /Account Razor components.
