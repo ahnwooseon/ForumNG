@@ -1,3 +1,12 @@
+using FluentResults;
+using ForumNG.Application.Queries.Users.GetUserById;
+using ForumNG.Domain.DTOs;
+using ForumNG.Domain.Interfaces;
+using ForumNG.Infrastructure.Data;
+using ForumNG.Infrastructure.Repositories;
+using Mediator;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -9,6 +18,23 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddProblemDetails();
 
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddMediator(options =>
+{
+    options.ServiceLifetime = ServiceLifetime.Scoped;
+});
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:Configuration"];
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,40 +45,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing",
-    "Bracing",
-    "Chilly",
-    "Cool",
-    "Mild",
-    "Warm",
-    "Balmy",
-    "Hot",
-    "Sweltering",
-    "Scorching",
-};
-
 app.MapGet(
-        "/weatherforecast",
-        () =>
-        {
-            var forecast = Enumerable
-                .Range(1, 5)
-                .Select(index => new WeatherForecast(
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-                .ToArray();
-            return forecast;
-        }
-    )
-    .WithName("GetWeatherForecast");
+    "/api/users/{id:guid}",
+    async (Guid id, ISender mediator, CancellationToken ct) =>
+    {
+        Result<UserDto> result = await mediator.Send(new GetUserByIdQuery(id), ct);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : Results.NotFound(result.Errors.FirstOrDefault()?.Message);
+    }
+);
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
