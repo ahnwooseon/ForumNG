@@ -4,4 +4,4 @@ using Mediator;
 
 namespace ForumNG.Application.Commands.Topics.CreateTopic;
 
-public record CreateTopicCommand(Guid AuthorId, string Title) : IRequest<Result<TopicDto>>;
+public record CreateTopicCommand(Guid AuthorId, string Title, string Content) : IRequest<Result<TopicDto>>;
