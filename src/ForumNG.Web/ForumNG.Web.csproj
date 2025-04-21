@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Syncfusion.Blazor" Version="29.1.38" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="29.1.38" />
   </ItemGroup>
 
 </Project>

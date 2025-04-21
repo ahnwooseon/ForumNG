@@ -2,80 +2,74 @@
 @page "/topics"
 
 @using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.Grids
 @using ForumNG.Domain.DTOs
+
 @inject IHttpClientFactory HttpClientFactory
 
-<h1>ForumNG</h1>
+<div style="max-width:1200px; margin:1em auto; padding: 1em;">
+    <h1>ForumNG</h1>
+    <h3>18-25</h3>
 
-<h3>18-25</h3>
-@if (topics is null)
-{
-    <em>Loading topics…</em>
-}
-else if (topics.Count == 0)
-{
-    <em>No topics at the moment.</em>
-}
-else
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Count</th>
-            <th>Creation date</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (TopicDto topic in topics)
-        {
-            DateTime localTime = topic.CreatedAt.ToLocalTime();
-            <tr>
-                <td>
-                    <a href="@($"/topics/{topic.Id}")">@topic.Title</a>
-                </td>
-                <td>@topic.AuthorId</td>
-                <td>@topic.Count</td>
-                <td>
-                    @(localTime.Date == DateTime.Now.Date
-                        ? localTime.ToString("HH:mm:ss")
-                        : localTime.ToString("dd/MM/yyyy"))
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+    @if (topics is null)
+    {
+        <em>Loading topics…</em>
+    }
 
-<h3>New topic</h3>
+    <SfGrid DataSource="@topics" AllowPaging="true" EnableResponsive="true" Width="100%">
+        <GridPageSettings PageSize="10" />
+        <GridColumns>
+            <GridColumn Field="Title" HeaderText="Title">
+                <Template Context="topic">
+                    <a href="@($"/topics/{((TopicDto)topic).Id}")">
+                        @(((TopicDto)topic).Title)
+                    </a>
+                </Template>
+            </GridColumn>
+            <GridColumn Field="AuthorId" HeaderText="Author" />
+            <GridColumn Field="Count" HeaderText="Count" TextAlign="TextAlign.Right" />
+            <GridColumn Field="CreatedAt" HeaderText="Created At" TextAlign="TextAlign.Center">
+                <Template Context="topic">
+                    @{
+                        DateTime localTime = ((TopicDto)topic).CreatedAt.ToLocalTime();
+                        string displayDate = localTime.Date == DateTime.Now.Date
+                            ? localTime.ToString("HH:mm:ss")
+                            : localTime.ToString("dd/MM/yyyy");
+                    }
+                    @displayDate
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
 
-<EditForm Model="@newTopic" OnValidSubmit="@CreateTopicAsync">
-    <DataAnnotationsValidator />
-    <div>
-        <InputText id="title" @bind-Value="newTopic.Title" class="form-control" placeholder="Title" disabled="@processing" />
-        <ValidationMessage For="@(() => newTopic.Title)" />
-    </div>
-    <div style="margin-top:1em">
-        <InputTextArea id="content" @bind-Value="newTopic.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5" disabled="@processing"/>
-        <ValidationMessage For="@(() => newTopic.Content)" />
-    </div>
-    <button type="submit" class="btn btn-primary mt-2" disabled="@processing">
-        @if (processing)
-        {
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-        }
-        else
-        {
-            <span>Post</span>
-        }
-    </button>
-</EditForm>
+    <h3>New topic</h3>
+    <EditForm Model="@newTopic" OnValidSubmit="@CreateTopicAsync">
+        <DataAnnotationsValidator />
+        <div>
+            <InputText id="title" @bind-Value="newTopic.Title" class="form-control" placeholder="Title" disabled="@processing" />
+            <ValidationMessage For="@(() => newTopic.Title)" />
+        </div>
+        <div style="margin-top:1em">
+            <InputTextArea id="content" @bind-Value="newTopic.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5" disabled="@processing"/>
+            <ValidationMessage For="@(() => newTopic.Content)" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2" disabled="@processing">
+            @if (processing)
+            {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            }
+            else
+            {
+                <span>Post</span>
+            }
+        </button>
+    </EditForm>
 
-@if (!string.IsNullOrWhiteSpace(formMessage))
-{
-    <div class="alert alert-info mt-3">@formMessage</div>
-}
+    @if (!string.IsNullOrWhiteSpace(formMessage))
+    {
+        <div class="alert alert-info mt-3">@formMessage</div>
+    }
+</div>
 
 @code {
     private NewTopicModel newTopic = new();
