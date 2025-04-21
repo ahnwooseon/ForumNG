@@ -17,5 +17,8 @@ public class TopicRepository(ApplicationDbContext context) : ITopicRepository
         await context.Topics.FindAsync([id], ct);
 
     public async Task<List<Topic>> GetAllAsync(CancellationToken ct) =>
-        await context.Topics.OrderByDescending(t => t.CreatedAt).ToListAsync(ct);
+        await context
+            .Topics.Include(t => t.Posts)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync(ct);
 }

@@ -1,0 +1,160 @@
+@rendermode InteractiveServer
+@page "/topics/{TopicId:guid}"
+
+@using System.ComponentModel.DataAnnotations
+@using ForumNG.Domain.DTOs
+
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Topic</PageTitle>
+
+@if (loading)
+{
+    <div><em>Loading topic...</em></div>
+}
+else if (topic == null)
+{
+    <div class="alert alert-warning">Topic not found.</div>
+    <a href="/topics" class="btn btn-link mb-3">Topics list</a>
+}
+else
+{
+    <div>
+        <h1>@topic.Title</h1>
+    </div>
+    <div>
+        <a href="/topics" class="btn btn-link mb-3">Topics list</a>
+    </div>
+
+    @if (posts is null)
+    {
+        <p><em>Loading messages...</em></p>
+    }
+    else if (posts.Count == 0)
+    {
+        <p>No messages for this topic.</p>
+    }
+    else
+    {
+        <ul class="list-unstyled">
+            @foreach (var post in posts)
+            {
+                <li class="mb-3 border-bottom pb-2">
+                    <div>
+                        <span class="badge bg-secondary me-1">@DisplayAuthor(post.AuthorId)</span>
+                        <small class="text-muted">on @post.CreatedAt.ToLocalTime()</small>
+                    </div>
+                    <div>@post.Content</div>
+                </li>
+            }
+        </ul>
+    }
+
+    <h4>Reply</h4>
+    <EditForm Model="@newPost" OnValidSubmit="@CreatePostAsync" FormName="CreatePostForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <InputTextArea id="content" @bind-Value="newPost.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5"/>
+            <ValidationMessage For="@(() => newPost.Content)" />
+        </div>
+        <button type="submit" class="btn btn-success" disabled="@posting">
+            @if (posting)
+            {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true">Sending…</span>
+            }
+            else
+            {
+                <span>Post</span>
+            }
+        </button>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(formMessage))
+    {
+        <div class="alert alert-info mt-2">@formMessage</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid TopicId { get; set; }
+
+    private TopicDto? topic;
+    private List<PostDto>? posts;
+    private NewPostModel newPost = new();
+    private string formMessage = string.Empty;
+    private bool posting;
+    private bool loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+        HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+
+        // Run both requests in parallel for performance
+        var getTopicTask = client.GetFromJsonAsync<TopicDto>($"api/topics/{TopicId}");
+        var getPostsTask = client.GetFromJsonAsync<List<PostDto>>($"api/topics/{TopicId}/posts");
+
+        await Task.WhenAll(getTopicTask, getPostsTask);
+
+        topic = getTopicTask.Result;
+        posts = getPostsTask.Result ?? [];
+
+        loading = false;
+    }
+
+    private async Task CreatePostAsync()
+    {
+        posting = true;
+        formMessage = string.Empty;
+
+        try
+        {
+            HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+
+            var payload = new { TopicId, newPost.Content };
+
+            HttpResponseMessage response = await client.PostAsJsonAsync("api/posts", payload);
+            if (response.IsSuccessStatusCode)
+            {
+                // Read created post for instant add (optional if API returns)
+                PostDto? created = await response.Content.ReadFromJsonAsync<PostDto>();
+                if (created is not null)
+                {
+                    posts ??= [];
+                    posts.Add(created);
+                }
+                else
+                {
+                    // Otherwise reload the list (fallback)
+                    posts = await client.GetFromJsonAsync<List<PostDto>>($"api/topics/{TopicId}/posts") ?? [];
+                }
+                newPost = new();
+                formMessage = "Message added!";
+            }
+            else
+            {
+                string err = await response.Content.ReadAsStringAsync();
+                formMessage = !string.IsNullOrWhiteSpace(err)
+                    ? $"Error when adding message: {err}"
+                    : "Error when adding message.";
+            }
+        }
+        catch (Exception ex)
+        {
+            formMessage = "Network or unexpected error: " + ex.Message;
+        }
+        posting = false;
+    }
+
+    private static string DisplayAuthor(Guid authorId)
+        => authorId == Guid.Empty ? "Anonymous" : authorId.ToString()[..8] + "…";
+
+    public class NewPostModel
+    {
+        [Required(ErrorMessage = "Message is required")]
+        [MaxLength(1000, ErrorMessage = "Maximum 1000 characters")]
+        public string Content { get; set; } = string.Empty;
+    }
+}

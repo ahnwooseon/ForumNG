@@ -16,7 +16,16 @@ public class GetAllTopicsQueryHandler(ITopicRepository repository)
     )
     {
         List<Topic> topics = await repository.GetAllAsync(ct);
-        var dtos = topics.Adapt<List<TopicDto>>();
+
+        List<TopicDto> dtos = topics.Select(t => new TopicDto(
+            t.Id,
+            t.AuthorId,
+            t.Title,
+            t.Posts?.Count ?? 0,
+            t.CreatedAt
+        )).ToList();
+
         return Result.Ok(dtos);
+
     }
 }

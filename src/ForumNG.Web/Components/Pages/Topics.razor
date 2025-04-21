@@ -1,0 +1,137 @@
+@rendermode InteractiveServer
+@page "/topics"
+
+@using System.ComponentModel.DataAnnotations
+@using ForumNG.Domain.DTOs
+@inject IHttpClientFactory HttpClientFactory
+
+<h1>ForumNG</h1>
+
+<h3>18-25</h3>
+@if (topics is null)
+{
+    <em>Loading topics…</em>
+}
+else if (topics.Count == 0)
+{
+    <em>No topics at the moment.</em>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Count</th>
+            <th>Creation date</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (TopicDto topic in topics)
+        {
+            DateTime localTime = topic.CreatedAt.ToLocalTime();
+            <tr>
+                <td>
+                    <a href="@($"/topics/{topic.Id}")">@topic.Title</a>
+                </td>
+                <td>@topic.AuthorId</td>
+                <td>@topic.Count</td>
+                <td>
+                    @(localTime.Date == DateTime.Now.Date
+                        ? localTime.ToString("HH:mm:ss")
+                        : localTime.ToString("dd/MM/yyyy"))
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<h3>New topic</h3>
+
+<EditForm Model="@newTopic" OnValidSubmit="@CreateTopicAsync">
+    <DataAnnotationsValidator />
+    <div>
+        <InputText id="title" @bind-Value="newTopic.Title" class="form-control" placeholder="Title" disabled="@processing" />
+        <ValidationMessage For="@(() => newTopic.Title)" />
+    </div>
+    <div style="margin-top:1em">
+        <InputTextArea id="content" @bind-Value="newTopic.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5" disabled="@processing"/>
+        <ValidationMessage For="@(() => newTopic.Content)" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2" disabled="@processing">
+        @if (processing)
+        {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        }
+        else
+        {
+            <span>Post</span>
+        }
+    </button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(formMessage))
+{
+    <div class="alert alert-info mt-3">@formMessage</div>
+}
+
+@code {
+    private NewTopicModel newTopic = new();
+    private string formMessage = string.Empty;
+    private List<TopicDto>? topics;
+    private bool processing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTopicsAsync();
+    }
+
+    private async Task LoadTopicsAsync()
+    {
+        HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+        topics = await client.GetFromJsonAsync<List<TopicDto>>("api/topics") ?? [];
+    }
+
+    private async Task CreateTopicAsync()
+    {
+        processing = true;
+        formMessage = string.Empty;
+        try
+        {
+            HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+            HttpResponseMessage response = await client.PostAsJsonAsync("api/topics", newTopic);
+
+            if (response.IsSuccessStatusCode)
+            {
+                formMessage = "Topic created successfully!";
+                newTopic = new NewTopicModel();
+                await LoadTopicsAsync();
+            }
+            else
+            {
+                string errorMsg = await response.Content.ReadAsStringAsync();
+                formMessage = $"Error when creating topic: { errorMsg ?? "" }";
+            }
+        }
+        catch (Exception ex)
+        {
+            formMessage = "Network or unexpected error: " + ex.Message;
+        }
+        processing = false;
+    }
+
+    public class NewTopicModel
+    {
+        [Required(ErrorMessage = "Title is required")]
+        [MinLength(3, ErrorMessage = "A title must contain at least 3 characters")]
+        [MaxLength(50, ErrorMessage = "A title can contain at most 50 characters")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Content is required")]
+        [MinLength(10, ErrorMessage = "A post must contain at least 10 characters")]
+        [MaxLength(1000, ErrorMessage = "A post can contain at most 1000 characters")]
+        public string Content { get; set; } = string.Empty;
+    }
+}
