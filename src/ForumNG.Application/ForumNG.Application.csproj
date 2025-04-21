@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentResults" Version="3.16.0" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Mediator.Abstractions" Version="2.1.7" />
   </ItemGroup>
 

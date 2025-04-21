@@ -1,4 +1,12 @@
 using FluentResults;
+using ForumNG.Api.Endpoints;
+using ForumNG.Application.Commands.Posts.CreatePost;
+using ForumNG.Application.Commands.Topics.CreateTopic;
+using ForumNG.Application.Mappings;
+using ForumNG.Application.Queries.Posts.GetPostById;
+using ForumNG.Application.Queries.Posts.GetPostsByTopicId;
+using ForumNG.Application.Queries.Topics.GetAllTopics;
+using ForumNG.Application.Queries.Topics.GetTopicById;
 using ForumNG.Application.Queries.Users.GetUserById;
 using ForumNG.Domain.DTOs;
 using ForumNG.Domain.Interfaces;
@@ -23,12 +31,16 @@ var connectionString =
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddMediator(options =>
 {
     options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+MapsterRegister.RegisterMappings();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -45,15 +57,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet(
-    "/api/users/{id:guid}",
-    async (Guid id, ISender mediator, CancellationToken ct) =>
-    {
-        Result<UserDto> result = await mediator.Send(new GetUserByIdQuery(id), ct);
-        return result.IsSuccess
-            ? Results.Ok(result.Value)
-            : Results.NotFound(result.Errors.FirstOrDefault()?.Message);
-    }
-);
+PostsEndpoints.MapPostsEndpoints(app);
+TopicsEndpoints.MapTopicsEndpoints(app);
+UsersEndpoints.MapUsersEndpoints(app);
 
 app.Run();
