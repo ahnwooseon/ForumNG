@@ -22,7 +22,7 @@ public class GetAllTopicsQueryHandler(ITopicRepository repository)
             t.AuthorId,
             t.Title,
             t.Posts?.Count ?? 0,
-            t.CreatedAt
+            t.Posts.Max(p => p.CreatedAt)
         )).ToList();
 
         return Result.Ok(dtos);

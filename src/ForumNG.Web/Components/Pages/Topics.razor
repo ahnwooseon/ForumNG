@@ -28,10 +28,10 @@
             </GridColumn>
             <GridColumn Field="AuthorId" HeaderText="Author" />
             <GridColumn Field="Count" HeaderText="Count" TextAlign="TextAlign.Right" />
-            <GridColumn Field="CreatedAt" HeaderText="Created At" TextAlign="TextAlign.Center">
+            <GridColumn Field="LastUpdated" HeaderText="Last updated" TextAlign="TextAlign.Center">
                 <Template Context="topic">
                     @{
-                        DateTime localTime = ((TopicDto)topic).CreatedAt.ToLocalTime();
+                        DateTime localTime = ((TopicDto)topic).LastUpdated.ToLocalTime();
                         string displayDate = localTime.Date == DateTime.Now.Date
                             ? localTime.ToString("HH:mm:ss")
                             : localTime.ToString("dd/MM/yyyy");
