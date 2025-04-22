@@ -1,10 +1,10 @@
 @rendermode InteractiveServer
 @page "/f/{CategoryName}/topics/{TopicId:guid}"
 
-@using ForumNG.Domain.DTOs
-@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Nav
 
-@inject IHttpClientFactory HttpClientFactory
+@using ForumNG.Domain.DTOs
+@using Syncfusion.Blazor.Buttons
 
 <PageTitle>Topic</PageTitle>
 
@@ -25,6 +25,8 @@ else
     <div>
         <a href="/f/@CategoryName" class="btn btn-link mb-3">List of topics</a>
     </div>
+
+    <h2>Membres connectés à ce topic : @ConnectedCount</h2>
 
     <div class="d-flex align-items-center mb-3">
         <label class="me-2">Rafraîchissement automatique</label>
@@ -60,7 +62,8 @@ else
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="mb-2">
-            <InputTextArea id="content" @bind-Value="_form.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5"/>
+            <InputTextArea id="content" @bind-Value="_form.Content" class="form-control" 
+                placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5"/>
             <ValidationMessage For="@(() => _form.Content)" />
         </div>
         <button type="submit" class="btn btn-success" disabled="@_processing">

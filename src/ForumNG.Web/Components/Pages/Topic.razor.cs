@@ -1,21 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
-using System.Net.Http.Json;
 using ForumNG.Domain.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ForumNG.Web.Components.Pages;
 
-public partial class Topic : ComponentBase, IDisposable
+public partial class Topic : ComponentBase, IAsyncDisposable
 {
-    [Parameter]
-    public required string CategoryName { get; set; }
+    [Parameter] public required string CategoryName { get; set; }
+    [Parameter] public Guid TopicId { get; set; }
 
-    [Parameter]
-    public Guid TopicId { get; set; }
-
-    [Inject]
-    public IHttpClientFactory HttpClientFactory { get; set; } = default!;
+    [Inject] public IHttpClientFactory HttpClientFactory { get; set; } = default!;
 
     protected TopicDto? _topic;
     protected List<PostDto>? _posts;
@@ -24,8 +19,10 @@ public partial class Topic : ComponentBase, IDisposable
     protected bool _processing;
     protected bool _loading = true;
     private Timer? _refreshTimer;
+    private HubConnection? hub;
+    protected int ConnectedCount;
 
-    private bool _autoRefreshBacking = false;
+    private bool _autoRefreshBacking;
     protected bool _autoRefresh
     {
         get => _autoRefreshBacking;
@@ -42,6 +39,7 @@ public partial class Topic : ComponentBase, IDisposable
     protected override async Task OnInitializedAsync()
     {
         StartOrStopTimer();
+        await InitializeSignalRAsync();
         await base.OnInitializedAsync();
     }
 
@@ -127,10 +125,34 @@ public partial class Topic : ComponentBase, IDisposable
         _posts = await client.GetFromJsonAsync<List<PostDto>>($"api/topics/{TopicId}/posts") ?? [];
     }
 
-    public void Dispose()
+    private async Task InitializeSignalRAsync()
+    {
+        hub = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/topichub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        hub.On<int>("UserCountChanged", (count) =>
+        {
+            ConnectedCount = count;
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hub.StartAsync();
+        await hub.SendAsync("JoinTopic", TopicId.ToString());
+    }
+
+    public async ValueTask DisposeAsync()
     {
         _refreshTimer?.Dispose();
+        if (hub is not null)
+        {
+            await hub.SendAsync("LeaveTopic", TopicId.ToString());
+            await hub.DisposeAsync();
+        }
     }
+    
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     public class FormModel
     {
