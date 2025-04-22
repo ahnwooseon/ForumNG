@@ -8,5 +8,5 @@ public interface IPostRepository
 
     Task<Post?> GetByIdAsync(Guid id, CancellationToken ct);
 
-    Task<List<Post>> GetByTopicIdAsync(Guid topicId, CancellationToken ct);
+    Task<List<Post>> GetByTopicIdAsync(Guid id, CancellationToken ct);
 }

@@ -16,6 +16,6 @@ public class PostRepository(ApplicationDbContext context) : IPostRepository
     public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct) =>
         await context.Posts.FindAsync([id], ct);
 
-    public async Task<List<Post>> GetByTopicIdAsync(Guid topicId, CancellationToken ct) =>
-        await context.Posts.Where(p => p.TopicId == topicId).ToListAsync(ct);
+    public async Task<List<Post>> GetByTopicIdAsync(Guid id, CancellationToken ct) =>
+        await context.Posts.Where(p => p.TopicId == id).ToListAsync(ct);
 }

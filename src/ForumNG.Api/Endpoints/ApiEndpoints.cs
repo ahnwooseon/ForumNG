@@ -4,19 +4,25 @@ public static class ApiEndpoints
 {
     private const string ApiBase = "/api";
 
+    public static class Categories
+    {
+        private const string Base = $"{ApiBase}/categories";
+        public const string PostTopic = $"{Base}/{{categoryName}}/topics";
+        public const string GetTopics = $"{Base}/{{categoryName}}/topics";
+    }
+
     public static class Posts
     {
         private const string Base = $"{ApiBase}/posts";
         public const string Create = Base;
         public const string Get = $"{Base}/{{id:guid}}";
-        public const string GetAllByTopicId = $"{ApiBase}/topics/{{topicId:guid}}/posts";
     }
 
     public static class Topics
     {
         private const string Base = $"{ApiBase}/topics";
-        public const string Create = Base;
         public const string Get = $"{Base}/{{id:guid}}";
+        public const string GetPosts = $"{Base}/{{id:guid}}/posts";
         public const string GetAll = Base;
     }
 

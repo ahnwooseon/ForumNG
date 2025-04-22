@@ -1,0 +1,140 @@
+@rendermode InteractiveServer
+@page "/f/{CategoryName}"
+
+@using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.Grids
+@using ForumNG.Domain.DTOs
+
+@inject IHttpClientFactory HttpClientFactory
+
+<div style="max-width:1200px; margin:1em auto; padding: 1em;">
+    <h1>ForumNG</h1>
+    <h3>@CategoryName</h3>
+
+    @if (_topics is null)
+    {
+        <div><em>Loading topics…</em></div>
+    }
+    else
+    {
+        <SfGrid DataSource="@_topics" AllowPaging="true" Width="100%">
+            <GridPageSettings PageSize="10"/>
+            <GridColumns>
+                <GridColumn Field="Title" HeaderText="Title" Width="67%">
+                    <Template Context="topic">
+                        <a href="/f/@CategoryName/topics/@(((TopicDto)topic).Id)">
+                            @(((TopicDto)topic).Title)
+                        </a>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="AuthorId" HeaderText="Author"/>
+                <GridColumn Field="Count" HeaderText="Count" TextAlign="TextAlign.Right"/>
+                <GridColumn Field="LastUpdated" HeaderText="Last updated" TextAlign="TextAlign.Center">
+                    <Template Context="topic">
+                        @{
+                            DateTime localTime = ((TopicDto)topic).LastUpdated.ToLocalTime();
+                            string displayDate = localTime.Date == DateTime.Now.Date
+                                ? localTime.ToString("HH:mm:ss")
+                                : localTime.ToString("dd/MM/yyyy");
+                        }
+                        @displayDate
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    }
+
+    <h3>New topic</h3>
+    <EditForm Model="@_form" OnValidSubmit="@CreateTopicAsync">
+        <DataAnnotationsValidator />
+        <div>
+            <InputText id="title" @bind-Value="_form.Title" class="form-control" placeholder="Title" disabled="@_processing" />
+            <ValidationMessage For="@(() => _form.Title)" />
+        </div>
+        <div style="margin-top:1em">
+            <InputTextArea id="content" @bind-Value="_form.Content" class="form-control" placeholder="Please stay polite and respect the forum rules. Any hateful or discriminatory message will be deleted and subject to sanctions." rows="5" disabled="@_processing"/>
+            <ValidationMessage For="@(() => _form.Content)" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2" disabled="@_processing">
+            @if (_processing)
+            {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            }
+            else
+            {
+                <span>Post</span>
+            }
+        </button>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(_formMessage))
+    {
+        <div class="alert alert-info mt-3">@_formMessage</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? CategoryName { get; set; }
+
+    private List<TopicDto>? _topics;
+    private FormModel _form = new();
+    private string _formMessage = string.Empty;
+    private bool _processing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTopicsAsync();
+    }
+
+    private async Task LoadTopicsAsync()
+    {
+        if (string.IsNullOrEmpty(CategoryName))
+            return;
+
+        HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+        _topics = await client.GetFromJsonAsync<List<TopicDto>>($"api/categories/{CategoryName}/topics") ?? [];
+    }
+
+    private async Task CreateTopicAsync()
+    {
+        _processing = true;
+        _formMessage = string.Empty;
+        try
+        {
+            HttpClient client = HttpClientFactory.CreateClient("MyApiClient");
+            var payload = new { _form.Title, _form.Content, CategoryName };
+            HttpResponseMessage response = await client.PostAsJsonAsync($"api/categories/{CategoryName}/topics", payload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _formMessage = "Topic created successfully!";
+                _form = new FormModel();
+                await LoadTopicsAsync();
+            }
+            else
+            {
+                string errorMsg = await response.Content.ReadAsStringAsync();
+                _formMessage = $"Error when creating topic: { errorMsg ?? "" }";
+            }
+        }
+        catch (Exception ex)
+        {
+            _formMessage = "Network or unexpected error: " + ex.Message;
+        }
+        _processing = false;
+    }
+
+    public class FormModel
+    {
+        [Required(ErrorMessage = "Title is required")]
+        [MinLength(3, ErrorMessage = "A title must contain at least 3 characters")]
+        [MaxLength(50, ErrorMessage = "A title can contain at most 50 characters")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Content is required")]
+        [MinLength(10, ErrorMessage = "A post must contain at least 10 characters")]
+        [MaxLength(1000, ErrorMessage = "A post can contain at most 1000 characters")]
+        public string Content { get; set; } = string.Empty;
+    }
+}

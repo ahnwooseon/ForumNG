@@ -5,6 +5,7 @@ using ForumNG.Domain.Interfaces;
 using ForumNG.Infrastructure.Data;
 using Mapster;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 
 namespace ForumNG.Application.Commands.Topics.CreateTopic;
 
@@ -42,9 +43,17 @@ public class CreateTopicCommandHandler(
 
     private async Task<Topic> CreateTopicAsync(CreateTopicCommand command, CancellationToken ct)
     {
+        Category? category = await context.Categories
+            .Where(c => c.Name == command.CategoryName)
+            .FirstOrDefaultAsync(ct);
+
+        if (category == null)
+            throw new InvalidOperationException("Category not found");
+
         Topic topic = new()
         {
             Id = Guid.NewGuid(),
+            CategoryId = category.Id,
             AuthorId = command.AuthorId,
             Title = command.Title,
             CreatedAt = DateTime.UtcNow,

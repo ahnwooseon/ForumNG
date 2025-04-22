@@ -17,7 +17,15 @@ public class GetTopicByIdQueryHandler(ITopicRepository repository)
         if (topic is null)
             return Result.Fail<TopicDto>("Topic not found");
 
-        var dto = topic.Adapt<TopicDto>();
-        return Result.Ok(dto);
+        /*TopicDto result = new(
+            topic.Id,
+            topic.AuthorId,
+            topic.Title,
+            topic.Posts?.Count ?? 0,
+            topic.Posts?.Max(p => p.CreatedAt) ?? DateTime.MinValue
+        );*/
+
+        var result = topic.Adapt<TopicDto>();
+        return Result.Ok(result);
     }
 }

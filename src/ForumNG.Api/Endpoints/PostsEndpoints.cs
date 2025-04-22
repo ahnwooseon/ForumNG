@@ -1,6 +1,5 @@
 using ForumNG.Application.Commands.Posts.CreatePost;
 using ForumNG.Application.Queries.Posts.GetPostById;
-using ForumNG.Application.Queries.Posts.GetPostsByTopicId;
 using Mediator;
 
 namespace ForumNG.Api.Endpoints;
@@ -26,16 +25,6 @@ public static class PostsEndpoints
                     mediator.Send(new GetPostByIdQuery(id), ct),
                     Results.Ok,
                     Results.NotFound
-                )
-        );
-
-        app.MapGet(
-            ApiEndpoints.Posts.GetAllByTopicId,
-            (Guid topicId, ISender mediator, CancellationToken ct) =>
-                MinimalApiHelpers.HandleResult(
-                    mediator.Send(new GetPostsByTopicIdQuery(topicId), ct),
-                    Results.Ok,
-                    err => Results.Problem(err)
                 )
         );
     }

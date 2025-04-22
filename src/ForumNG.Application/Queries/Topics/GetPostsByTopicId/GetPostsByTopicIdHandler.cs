@@ -5,7 +5,7 @@ using ForumNG.Domain.Interfaces;
 using Mapster;
 using Mediator;
 
-namespace ForumNG.Application.Queries.Posts.GetPostsByTopicId;
+namespace ForumNG.Application.Queries.Topics.GetPostsByTopicId;
 
 public class GetPostsByTopicIdQueryHandler(IPostRepository repository)
     : IRequestHandler<GetPostsByTopicIdQuery, Result<List<PostDto>>>
@@ -15,7 +15,7 @@ public class GetPostsByTopicIdQueryHandler(IPostRepository repository)
         CancellationToken ct
     )
     {
-        List<Post> posts = await repository.GetByTopicIdAsync(request.TopicId, ct);
+        List<Post> posts = await repository.GetByTopicIdAsync(request.Id, ct);
         return Result.Ok(posts.Adapt<List<PostDto>>());
     }
 }

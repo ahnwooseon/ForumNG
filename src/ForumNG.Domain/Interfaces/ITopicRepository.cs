@@ -8,5 +8,7 @@ public interface ITopicRepository
 
     Task<Topic?> GetByIdAsync(Guid id, CancellationToken ct);
 
+    Task<List<Topic>> GetByCategoryNameAsync(string categoryName, CancellationToken ct);
+
     Task<List<Topic>> GetAllAsync(CancellationToken ct);
 }

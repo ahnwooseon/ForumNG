@@ -4,7 +4,6 @@ using ForumNG.Application.Commands.Posts.CreatePost;
 using ForumNG.Application.Commands.Topics.CreateTopic;
 using ForumNG.Application.Mappings;
 using ForumNG.Application.Queries.Posts.GetPostById;
-using ForumNG.Application.Queries.Posts.GetPostsByTopicId;
 using ForumNG.Application.Queries.Topics.GetAllTopics;
 using ForumNG.Application.Queries.Topics.GetTopicById;
 using ForumNG.Application.Queries.Users.GetUserById;
@@ -57,6 +56,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+CategoriesEndpoints.MapCategoriesEndpoints(app);
 PostsEndpoints.MapPostsEndpoints(app);
 TopicsEndpoints.MapTopicsEndpoints(app);
 UsersEndpoints.MapUsersEndpoints(app);
